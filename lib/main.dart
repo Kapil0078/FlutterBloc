@@ -16,6 +16,9 @@ class MyApp extends StatelessWidget {
         BlocProvider<CounterBloc>(
           create: (context) => CounterBloc(),
         ),
+        BlocProvider(
+          create: (context) => Counter(0),
+        ),
       ],
       child: const HomeScreen(),
     );
@@ -29,7 +32,7 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bloc = BlocProvider.of<CounterBloc>(context);
+    final bloc = BlocProvider.of<CounterBloc>(context, listen: true);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -37,11 +40,11 @@ class HomeScreen extends StatelessWidget {
           title: const Text("Bloc"),
           elevation: 0.0,
         ),
-        body: Center(
+        body: SizedBox(
+          width: MediaQuery.of(context).size.width,
           child: Column(
-            mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
                 "${bloc.state}",
@@ -55,12 +58,48 @@ class HomeScreen extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   ActionChip(
-                    label: const Text("Incre"),
+                    label: const Text("Increment"),
                     avatar: const Icon(Icons.add),
-                    onPressed: () {
-                      bloc.counterEvent(CounterEvent.increment);
-                    },
+                    onPressed: () => bloc.increment(),
+                  ),
+                  const SizedBox(width: 20),
+                  SizedBox(
+                    width: 40,
+                    height: 40,
+                    child: FloatingActionButton(
+                      child: const Icon(Icons.exposure_zero),
+                      onPressed: () => bloc.neutral(),
+                    ),
+                  ),
+                  const SizedBox(width: 20),
+                  ActionChip(
+                    label: const Text("Decrement"),
+                    avatar: const Icon(Icons.remove),
+                    onPressed: () => bloc.decrement(),
                   )
+                ],
+              ),
+              const SizedBox(height: 50),
+              Text(
+                "${context.watch<Counter>().state}",
+                style: const TextStyle(
+                  fontSize: 50,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 25),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    width: 40,
+                    height: 40,
+                    child: FloatingActionButton(
+                      child: const Icon(Icons.exposure_zero),
+                      onPressed: () =>
+                          context.watch<Counter>().add(CounterEvent.increment),
+                    ),
+                  ),
                 ],
               ),
             ],
